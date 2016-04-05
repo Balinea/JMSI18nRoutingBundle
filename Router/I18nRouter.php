@@ -129,8 +129,17 @@ class I18nRouter extends Router
             $this->context->setHost($this->hostMap[$locale]);
         }
 
+        // Deprecation warning removal for Sf 2.8+
+        if (false === $absolute) {
+            $referenceType = self::ABSOLUTE_PATH;
+        } elseif (true === $absolute) {
+            $referenceType = self::ABSOLUTE_URL;
+        } else {
+            $referenceType = $absolute;
+        }
+
         try {
-            $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $absolute);
+            $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $referenceType);
 
             if ($absolute && $this->hostMap) {
                 $this->context->setHost($currentHost);
@@ -146,7 +155,7 @@ class I18nRouter extends Router
         }
 
         // use the default behavior if no localized route exists
-        return $generator->generate($name, $parameters, $absolute);
+        return $generator->generate($name, $parameters, $referenceType);
     }
 
     /**
